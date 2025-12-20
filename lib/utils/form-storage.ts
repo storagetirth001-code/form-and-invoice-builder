@@ -1,46 +1,46 @@
 import type { DocumentSchema } from "@/lib/types/schema"
+import { createClient } from "@/lib/supabase/client"
 
-export function saveFormToStorage(schema: DocumentSchema) {
-  if (typeof window === "undefined") return
-
+export async function saveFormToStorage(schema: DocumentSchema) {
   try {
-    localStorage.setItem(`form-${schema.id}`, JSON.stringify(schema))
-    console.log("[v0] Form saved to storage:", schema.id)
+    const supabase = createClient()
+
+    const { error } = await supabase.from("forms").upsert({
+      id: schema.id,
+      schema: schema,
+      google_sheet_url: schema.googleSheetUrl || null,
+      updated_at: new Date().toISOString(),
+    })
+
+    if (error) throw error
+    console.log("[v0] Form saved to database:", schema.id)
   } catch (error) {
     console.error("[v0] Failed to save form:", error)
   }
 }
 
-export function getFormFromStorage(formId: string): DocumentSchema | null {
-  if (typeof window === "undefined") return null
-
+export async function getFormFromStorage(formId: string): Promise<DocumentSchema | null> {
   try {
-    const stored = localStorage.getItem(`form-${formId}`)
-    if (stored) {
-      return JSON.parse(stored)
-    }
+    const supabase = createClient()
+
+    const { data, error } = await supabase.from("forms").select("schema").eq("id", formId).single()
+
+    if (error) throw error
+    return data?.schema || null
   } catch (error) {
     console.error("[v0] Failed to retrieve form:", error)
+    return null
   }
-
-  return null
 }
 
-export function getAllFormsFromStorage(): DocumentSchema[] {
-  if (typeof window === "undefined") return []
-
+export async function getAllFormsFromStorage(): Promise<DocumentSchema[]> {
   try {
-    const forms: DocumentSchema[] = []
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key?.startsWith("form-")) {
-        const stored = localStorage.getItem(key)
-        if (stored) {
-          forms.push(JSON.parse(stored))
-        }
-      }
-    }
-    return forms
+    const supabase = createClient()
+
+    const { data, error } = await supabase.from("forms").select("schema")
+
+    if (error) throw error
+    return data?.map((row) => row.schema) || []
   } catch (error) {
     console.error("[v0] Failed to retrieve forms:", error)
     return []

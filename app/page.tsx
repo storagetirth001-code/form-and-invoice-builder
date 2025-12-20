@@ -1,147 +1,198 @@
-"use client"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { FileText, Receipt, Plus } from "lucide-react"
-import type { DocumentType } from "@/lib/types/schema"
-import { useDocumentStore } from "@/lib/store/document-store"
-import { getTemplatesByType } from "@/lib/templates"
+import { FileText, Receipt, Zap, Database, Share2, ArrowRight } from "lucide-react"
 
-export default function HomePage() {
-  const [selectedType, setSelectedType] = useState<DocumentType | null>(null)
-  const createDocument = useDocumentStore((state) => state.createDocument)
-  const loadDocument = useDocumentStore((state) => state.loadDocument)
-  const router = useRouter()
-
-  const handleCreateBlank = () => {
-    if (!selectedType) return
-    createDocument(selectedType, selectedType === "form" ? "New Form" : "New Invoice")
-    router.push("/builder/new")
-  }
-
-  const handleSelectTemplate = (templateId: string) => {
-    if (!selectedType) return
-    const templates = getTemplatesByType(selectedType)
-    const template = templates.find((t) => t.id === templateId)
-    if (template) {
-      // Create a new document from template with new ID
-      const newDoc = {
-        ...template,
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      loadDocument(newDoc)
-      router.push("/builder/new")
-    }
-  }
-
-  if (!selectedType) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/20 p-8">
-        <div className="max-w-4xl w-full">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Form & Invoice Builder</h1>
-            <p className="text-lg text-muted-foreground">Choose what you want to create</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card
-              className="p-8 cursor-pointer hover:border-primary transition-colors"
-              onClick={() => setSelectedType("form")}
-            >
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <FileText className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold mb-2">Form Builder</h2>
-                  <p className="text-muted-foreground">
-                    Create custom forms with text inputs, dropdowns, checkboxes, and more
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            <Card
-              className="p-8 cursor-pointer hover:border-primary transition-colors"
-              onClick={() => setSelectedType("invoice")}
-            >
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Receipt className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold mb-2">Invoice Builder</h2>
-                  <p className="text-muted-foreground">
-                    Design professional invoices with line items, tax calculations, and more
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const templates = getTemplatesByType(selectedType)
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-muted/20 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <Button variant="ghost" onClick={() => setSelectedType(null)} className="mb-4">
-            ← Back
-          </Button>
-          <h1 className="text-3xl font-bold mb-2">Choose a {selectedType === "form" ? "Form" : "Invoice"} Template</h1>
-          <p className="text-muted-foreground">Start with a template or create from scratch</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card
-            className="p-6 cursor-pointer hover:border-primary transition-colors border-dashed"
-            onClick={handleCreateBlank}
-          >
-            <div className="flex flex-col items-center justify-center text-center h-full min-h-[200px] gap-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Plus className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Start Blank</h3>
-                <p className="text-sm text-muted-foreground">Build from scratch</p>
-              </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-foreground rounded-lg" />
+              <span className="text-xl font-bold">FormBuilder</span>
             </div>
-          </Card>
-
-          {templates.map((template) => (
-            <Card
-              key={template.id}
-              className="p-6 cursor-pointer hover:border-primary transition-colors"
-              onClick={() => handleSelectTemplate(template.id)}
-            >
-              <div className="flex flex-col gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  {selectedType === "form" ? (
-                    <FileText className="w-6 h-6 text-primary" />
-                  ) : (
-                    <Receipt className="w-6 h-6 text-primary" />
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">{template.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{template.components.length} components</p>
-                  <div className="text-xs text-muted-foreground">
-                    Theme: <span className="capitalize">{template.theme}</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
+            <nav className="hidden md:flex items-center gap-8">
+              <Link href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Features
+              </Link>
+              <Link href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Pricing
+              </Link>
+              <Link
+                href="/auth/login"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Log in
+              </Link>
+              <Link href="/auth/signup">
+                <Button size="sm">Get started</Button>
+              </Link>
+            </nav>
+            <div className="md:hidden">
+              <Link href="/auth/signup">
+                <Button size="sm">Get started</Button>
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="py-20 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
+              Build forms and invoices in minutes, not hours
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 text-balance">
+              The complete platform to create beautiful forms and professional invoices. Share links, collect responses,
+              and export PDFs instantly.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/auth/signup">
+                <Button size="lg" className="w-full sm:w-auto">
+                  Get started—it's free
+                </Button>
+              </Link>
+              <Link href="#features">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent">
+                  Explore features
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section id="features" className="py-20 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything you need to succeed</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Powerful features that make form and invoice creation effortless
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="p-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Zap className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Drag & Drop Builder</h3>
+              <p className="text-muted-foreground">
+                Build forms and invoices visually with our intuitive drag-and-drop interface. No coding required.
+              </p>
+            </Card>
+
+            <Card className="p-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Share2 className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Share Live Forms</h3>
+              <p className="text-muted-foreground">
+                Generate shareable links for your forms. Collect responses from anyone with the link.
+              </p>
+            </Card>
+
+            <Card className="p-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Database className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Response Management</h3>
+              <p className="text-muted-foreground">
+                View all form submissions in organized tables. Export data or connect to Google Sheets.
+              </p>
+            </Card>
+
+            <Card className="p-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <FileText className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Professional Templates</h3>
+              <p className="text-muted-foreground">
+                Start fast with pre-built templates for contact forms, feedback surveys, and more.
+              </p>
+            </Card>
+
+            <Card className="p-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Receipt className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Invoice Generator</h3>
+              <p className="text-muted-foreground">
+                Create professional invoices with automatic calculations for tax, discounts, and totals.
+              </p>
+            </Card>
+
+            <Card className="p-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <ArrowRight className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">PDF Export</h3>
+              <p className="text-muted-foreground">
+                Export invoices as high-quality PDFs ready to send to clients. One click, done.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Built for teams of all sizes</h2>
+            <p className="text-lg text-muted-foreground">From freelancers to enterprises</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">10x</div>
+              <div className="text-muted-foreground">Faster than traditional methods</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">100%</div>
+              <div className="text-muted-foreground">No-code solution</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">∞</div>
+              <div className="text-muted-foreground">Unlimited forms and responses</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-foreground text-background">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-balance">Ready to build something amazing?</h2>
+          <p className="text-lg md:text-xl mb-8 opacity-90">
+            Join thousands of users creating forms and invoices with FormBuilder
+          </p>
+          <Link href="/auth/signup">
+            <Button size="lg" variant="secondary">
+              Get started for free
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-foreground rounded" />
+              <span className="font-semibold">FormBuilder</span>
+            </div>
+            <p className="text-sm text-muted-foreground">© 2025 FormBuilder. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

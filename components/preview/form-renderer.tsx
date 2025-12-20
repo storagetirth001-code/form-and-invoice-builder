@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card } from "@/components/ui/card"
 
 interface FormRendererProps {
   schema: DocumentSchema
@@ -129,30 +128,20 @@ export function FormRenderer({ schema, isPublic, onSubmit }: FormRendererProps) 
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-8">
-      <Card className="p-6 space-y-6">
-        {!isPublic && (
-          <div>
-            <h2 className="text-2xl font-bold">{schema.title}</h2>
-          </div>
+    <div className="w-full max-w-2xl mx-auto">
+      <form onSubmit={handleFormSubmit} className="space-y-6">
+        <div className="space-y-4">
+          {schema.components.map((component) => (
+            <RenderFormComponent key={component.id} component={component} isPublic={isPublic} />
+          ))}
+        </div>
+
+        {isPublic && (
+          <Button type="submit" className="w-full" size="lg">
+            Submit
+          </Button>
         )}
-
-        <form onSubmit={handleFormSubmit}>
-          <div className="space-y-4">
-            {schema.components.map((component) => (
-              <RenderFormComponent key={component.id} component={component} isPublic={isPublic} />
-            ))}
-          </div>
-
-          {isPublic && (
-            <div className="mt-6">
-              <Button type="submit" className="w-full">
-                Submit
-              </Button>
-            </div>
-          )}
-        </form>
-      </Card>
+      </form>
     </div>
   )
 }

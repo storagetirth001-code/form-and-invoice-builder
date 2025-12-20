@@ -2,6 +2,7 @@
 
 import { create } from "zustand"
 import type { DocumentSchema, Component, DocumentType, Theme } from "@/lib/types/schema"
+import { saveFormToStorage } from "@/lib/utils/form-storage"
 
 interface DocumentState {
   document: DocumentSchema | null
@@ -43,6 +44,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       updatedAt: new Date().toISOString(),
     }
 
+    saveFormToStorage(newDoc)
+
     set({
       document: newDoc,
       history: [newDoc],
@@ -70,6 +73,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       updatedAt: new Date().toISOString(),
     }
 
+    saveFormToStorage(updatedDoc)
+
     const newHistory = history.slice(0, historyIndex + 1)
     newHistory.push(updatedDoc)
 
@@ -90,6 +95,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       updatedAt: new Date().toISOString(),
     }
 
+    saveFormToStorage(updatedDoc)
+
     const newHistory = history.slice(0, historyIndex + 1)
     newHistory.push(updatedDoc)
 
@@ -109,6 +116,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       components: document.components.filter((comp) => comp.id !== id),
       updatedAt: new Date().toISOString(),
     }
+
+    saveFormToStorage(updatedDoc)
 
     const newHistory = history.slice(0, historyIndex + 1)
     newHistory.push(updatedDoc)
@@ -135,6 +144,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       updatedAt: new Date().toISOString(),
     }
 
+    saveFormToStorage(updatedDoc)
+
     const newHistory = history.slice(0, historyIndex + 1)
     newHistory.push(updatedDoc)
 
@@ -159,6 +170,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       updatedAt: new Date().toISOString(),
     }
 
+    saveFormToStorage(updatedDoc)
+
     const newHistory = history.slice(0, historyIndex + 1)
     newHistory.push(updatedDoc)
 
@@ -173,12 +186,16 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     const { document } = get()
     if (!document) return
 
+    const updatedDoc = {
+      ...document,
+      title,
+      updatedAt: new Date().toISOString(),
+    }
+
+    saveFormToStorage(updatedDoc)
+
     set({
-      document: {
-        ...document,
-        title,
-        updatedAt: new Date().toISOString(),
-      },
+      document: updatedDoc,
     })
   },
 
@@ -186,13 +203,17 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     const { document } = get()
     if (!document) return
 
+    const updatedDoc = {
+      ...document,
+      googleSheetId: sheetId,
+      googleSheetUrl: sheetUrl,
+      updatedAt: new Date().toISOString(),
+    }
+
+    saveFormToStorage(updatedDoc)
+
     set({
-      document: {
-        ...document,
-        googleSheetId: sheetId,
-        googleSheetUrl: sheetUrl,
-        updatedAt: new Date().toISOString(),
-      },
+      document: updatedDoc,
     })
   },
 

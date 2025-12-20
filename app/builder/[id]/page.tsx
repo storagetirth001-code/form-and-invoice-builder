@@ -4,27 +4,109 @@ import { BuilderLayout } from "@/components/builder/builder-layout"
 import { PreviewPanel } from "@/components/preview/preview-panel"
 import { useDocumentStore } from "@/lib/store/document-store"
 import { Button } from "@/components/ui/button"
-import { Undo, Redo, Eye, Code } from "lucide-react"
+import { Undo, Redo, Eye, Code, ArrowLeft, Save } from "lucide-react"
 import { useState, useEffect } from "react"
+import { useRouter, useParams } from "next/navigation"
 import { exportToPDF } from "@/lib/utils/pdf-export"
 import { useToast } from "@/hooks/use-toast"
-import { saveFormToStorage } from "@/lib/utils/form-storage"
+import { createBrowserClient } from "@supabase/ssr"
 
 export default function BuilderPage() {
+  const params = useParams()
+  const formId = params.id as string
   const [showPreview, setShowPreview] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const undo = useDocumentStore((state) => state.undo)
   const redo = useDocumentStore((state) => state.redo)
   const canUndo = useDocumentStore((state) => state.canUndo())
   const canRedo = useDocumentStore((state) => state.canRedo())
   const document = useDocumentStore((state) => state.document)
+  const loadDocument = useDocumentStore((state) => state.loadDocument)
   const { toast } = useToast()
+  const router = useRouter()
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
 
   useEffect(() => {
-    if (document && document.type === "form") {
-      saveFormToStorage(document)
+    loadFormFromDatabase()
+  }, [formId])
+
+  const loadFormFromDatabase = async () => {
+    try {
+      const { data, error } = await supabase.from("forms").select("*").eq("id", formId).single()
+
+      if (error) throw error
+
+      if (data) {
+        loadDocument(data.schema)
+      }
+    } catch (error: any) {
+      console.error("[v0] Error loading form:", error)
+      toast({
+        title: "Error",
+        description: "Failed to load form",
+        variant: "destructive",
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (document) {
+      const timeoutId = setTimeout(() => {
+        saveToDatabase()
+      }, 1000) // Auto-save after 1 second of inactivity
+
+      return () => clearTimeout(timeoutId)
     }
   }, [document])
+
+  const saveToDatabase = async () => {
+    if (!document) return
+
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { error } = await supabase
+        .from("forms")
+        .update({
+          schema: document,
+          title: document.title,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", formId)
+        .eq("user_id", user.id)
+
+      if (error) throw error
+    } catch (error: any) {
+      console.error("[v0] Auto-save error:", error)
+    }
+  }
+
+  const handleManualSave = async () => {
+    setIsSaving(true)
+    try {
+      await saveToDatabase()
+      toast({
+        title: "Saved",
+        description: "Your changes have been saved",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to save changes",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const handleExportPDF = async () => {
     if (!document) return
@@ -54,11 +136,18 @@ export default function BuilderPage() {
       {/* Toolbar */}
       <div className="border-b bg-background p-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
           <Button variant="ghost" size="sm" onClick={undo} disabled={!canUndo}>
             <Undo className="w-4 h-4" />
           </Button>
           <Button variant="ghost" size="sm" onClick={redo} disabled={!canRedo}>
             <Redo className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleManualSave} disabled={isSaving}>
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? "Saving..." : "Save"}
           </Button>
         </div>
 
