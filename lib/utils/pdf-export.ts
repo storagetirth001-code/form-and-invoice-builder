@@ -18,73 +18,54 @@ export async function exportToPDF(elementId: string, filename: string) {
   document.body.appendChild(clonedElement)
 
   try {
-    // Get all elements including the clone itself
+    const stripStyles = (el: HTMLElement) => {
+      el.removeAttribute("style")
+      el.removeAttribute("class")
+
+      // Remove all style attributes from children recursively
+      Array.from(el.children).forEach((child) => {
+        stripStyles(child as HTMLElement)
+      })
+    }
+
+    stripStyles(clonedElement)
+
     const allElements = [clonedElement, ...Array.from(clonedElement.querySelectorAll("*"))]
 
     allElements.forEach((el) => {
       const htmlEl = el as HTMLElement
       const computedStyle = window.getComputedStyle(htmlEl)
 
-      // Create a style object to hold converted colors
-      const styleOverrides: any = {}
+      // Only apply safe font properties from computed styles
+      const fontSize = computedStyle.fontSize
+      const fontWeight = computedStyle.fontWeight
+      const lineHeight = computedStyle.lineHeight
 
-      // Handle all color properties
-      const colorProperties = [
-        "backgroundColor",
-        "color",
-        "borderTopColor",
-        "borderRightColor",
-        "borderBottomColor",
-        "borderLeftColor",
-        "borderColor",
-        "outlineColor",
-      ]
+      if (fontSize) htmlEl.style.fontSize = fontSize
+      if (fontWeight) htmlEl.style.fontWeight = fontWeight
+      if (lineHeight) htmlEl.style.lineHeight = lineHeight
 
-      colorProperties.forEach((prop) => {
-        try {
-          const value = computedStyle.getPropertyValue(prop.replace(/([A-Z])/g, "-$1").toLowerCase())
-          if (value && value !== "rgba(0, 0, 0, 0)" && value !== "transparent") {
-            // Force the browser to give us an RGB value by setting and reading
-            const tempDiv = document.createElement("div")
-            tempDiv.style.color = value
-            document.body.appendChild(tempDiv)
-            const rgbValue = window.getComputedStyle(tempDiv).color
-            document.body.removeChild(tempDiv)
-            styleOverrides[prop] = rgbValue
-          }
-        } catch (err) {
-          // Silently skip problematic properties
-        }
-      })
-
-      // Apply all color overrides
-      Object.keys(styleOverrides).forEach((prop) => {
-        ;(htmlEl.style as any)[prop] = styleOverrides[prop]
-      })
-
-      // Force font rendering
-      if (computedStyle.fontFamily) {
-        htmlEl.style.fontFamily = computedStyle.fontFamily
-      }
-      if (computedStyle.fontSize) {
-        htmlEl.style.fontSize = computedStyle.fontSize
-      }
-      if (computedStyle.fontWeight) {
-        htmlEl.style.fontWeight = computedStyle.fontWeight
-      }
+      // Set safe default colors
+      htmlEl.style.color = "#000000"
+      htmlEl.style.backgroundColor = "transparent"
     })
 
-    // Give the browser time to apply styles
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    // Give browser time to apply styles
+    await new Promise((resolve) => setTimeout(resolve, 50))
 
-    // Create canvas with better quality settings
     const canvas = await html2canvas(clonedElement, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
-      windowWidth: clonedElement.scrollWidth,
-      windowHeight: clonedElement.scrollHeight,
+      windowWidth: clonedElement.scrollWidth || 800,
+      windowHeight: clonedElement.scrollHeight || 600,
+      allowTaint: true,
+      removeContainer: false,
+      ignoreElements: (element) => {
+        // Skip problematic elements
+        return element.tagName === "SCRIPT" || element.tagName === "STYLE"
+      },
     })
 
     // Calculate PDF dimensions (A4 size)
