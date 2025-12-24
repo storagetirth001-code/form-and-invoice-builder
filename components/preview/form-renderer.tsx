@@ -128,7 +128,7 @@ export function FormRenderer({ schema, isPublic, onSubmit }: FormRendererProps) 
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-[210mm] mx-auto bg-white min-h-[297mm] p-6 sm:p-12 shadow-sm" id="form-preview">
       <form onSubmit={handleFormSubmit} className="space-y-6">
         <div className="space-y-4">
           {schema.components.map((component) => (

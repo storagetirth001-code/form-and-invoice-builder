@@ -4,7 +4,7 @@ import { BuilderLayout } from "@/components/builder/builder-layout"
 import { PreviewPanel } from "@/components/preview/preview-panel"
 import { useDocumentStore } from "@/lib/store/document-store"
 import { Button } from "@/components/ui/button"
-import { Undo, Redo, Eye, Code, ArrowLeft, Save } from "lucide-react"
+import { Undo, Redo, Eye, Code, ArrowLeft, Save, Download } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { exportToPDF } from "@/lib/utils/pdf-export"
@@ -114,7 +114,13 @@ export default function BuilderPage() {
     setIsExporting(true)
     try {
       const filename = `${document.title.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.pdf`
-      await exportToPDF("preview-content", filename)
+      const previewId =
+        document.type === "resume" ? "resume-preview" :
+          document.type === "invoice" ? "invoice-preview" :
+            document.type === "form" ? "form-preview" :
+              "preview-content"
+
+      await exportToPDF(previewId, filename)
       toast({
         title: "PDF Exported",
         description: "Your document has been successfully exported as PDF.",
@@ -134,27 +140,34 @@ export default function BuilderPage() {
   return (
     <div className="flex flex-col h-screen">
       {/* Toolbar */}
-      <div className="border-b bg-background p-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
-            <ArrowLeft className="w-4 h-4" />
+      <div className="border-b bg-background p-2 flex items-center justify-between shrink-0 h-14">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")} className="h-9 w-9 p-0 sm:w-auto sm:px-3">
+            <ArrowLeft className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Back</span>
           </Button>
-          <Button variant="ghost" size="sm" onClick={undo} disabled={!canUndo}>
+          <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
+          <Button variant="ghost" size="sm" onClick={undo} disabled={!canUndo} className="h-9 w-9 p-0">
             <Undo className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={redo} disabled={!canRedo}>
+          <Button variant="ghost" size="sm" onClick={redo} disabled={!canRedo} className="h-9 w-9 p-0">
             <Redo className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleManualSave} disabled={isSaving}>
-            <Save className="w-4 h-4 mr-2" />
-            {isSaving ? "Saving..." : "Save"}
+          <div className="h-6 w-px bg-border mx-1" />
+          <Button variant="ghost" size="sm" onClick={handleManualSave} disabled={isSaving} className="h-9 px-2 sm:px-3">
+            <Save className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">{isSaving ? "Saving..." : "Save"}</span>
           </Button>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
-            {showPreview ? <Code className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-            {showPreview ? "Builder" : "Preview"}
+          <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)} className="h-9 px-2 sm:px-3">
+            {showPreview ? <Code className="w-4 h-4 sm:mr-2" /> : <Eye className="w-4 h-4 sm:mr-2" />}
+            <span className="hidden sm:inline">{showPreview ? "Builder" : "Preview"}</span>
+          </Button>
+          <Button onClick={handleExportPDF} disabled={isExporting} className="h-9 px-3">
+            <Download className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Export</span>
           </Button>
         </div>
       </div>

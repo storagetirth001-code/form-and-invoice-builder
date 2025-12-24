@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { createBrowserClient } from "@supabase/ssr"
-import { FileText, Receipt, Plus, LogOut, Eye, Trash2, Copy } from "lucide-react"
+import { FileText, Receipt, Plus, LogOut, Eye, Trash2, Copy, UserCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import type { DocumentSchema } from "@/lib/types/schema"
 
@@ -162,8 +162,10 @@ export default function DashboardPage() {
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                     {form.schema.type === "form" ? (
                       <FileText className="w-6 h-6 text-primary" />
-                    ) : (
+                    ) : form.schema.type === "invoice" ? (
                       <Receipt className="w-6 h-6 text-primary" />
+                    ) : (
+                      <UserCircle className="w-6 h-6 text-primary" />
                     )}
                   </div>
                   <div className="flex gap-2">
@@ -186,20 +188,36 @@ export default function DashboardPage() {
                   {form.schema.components.length} components · {form.schema.type}
                 </p>
 
-                <div className="mt-auto flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 bg-transparent"
-                    onClick={() => router.push(`/builder/${form.id}`)}
-                  >
-                    Edit
-                  </Button>
-                  {form.schema.type === "form" && form.is_published && (
-                    <Button variant="outline" size="sm" onClick={() => handleCopyLink(form.id)} title="Copy link">
-                      <Copy className="w-4 h-4" />
+                <div className="mt-auto space-y-2">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 bg-transparent"
+                      onClick={() => router.push(`/builder/${form.id}`)}
+                    >
+                      Edit
                     </Button>
-                  )}
+                    {form.schema.type === "form" && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => router.push(`/dashboard/submissions/${form.id}`)}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Responses
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {form.schema.type === "form" && form.is_published && (
+                      <Button variant="outline" size="sm" className="flex-1" onClick={() => handleCopyLink(form.id)}>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy Link
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {form.is_published && (

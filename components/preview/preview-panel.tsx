@@ -1,4 +1,32 @@
 "use client"
+// "use client"
+
+// import { useDocumentStore } from "@/lib/store/document-store"
+// import { ResumeRenderer } from "./resume-renderer"
+// import { FormRenderer } from "./form-renderer"
+// import { ShareFormDialog } from "./share-form-dialog"
+// import { InvoiceRenderer } from "./invoice-renderer"
+
+// ... imports remain the same
+
+// ... inside component
+{/* <div className="flex-1 overflow-auto p-8" id="preview-content">
+  {document.type === "form" ? (
+    <FormRenderer schema={document} />
+  ) : document.type === "invoice" ? (
+    <InvoiceRenderer schema={document} />
+  ) : (
+    <ResumeRenderer document={document} />
+  )}
+</div>
+
+{ isForm && <ShareFormDialog open={showShareDialog} onOpenChange={setShowShareDialog} /> }
+    </div >
+  )
+} */}
+
+
+
 
 import { useDocumentStore } from "@/lib/store/document-store"
 import { FormRenderer } from "./form-renderer"
@@ -7,6 +35,7 @@ import { Button } from "@/components/ui/button"
 import { Download, Loader2, Share2 } from "lucide-react"
 import { useState } from "react"
 import { ShareFormDialog } from "./share-form-dialog"
+import { ResumeRenderer } from "./resume-renderer"
 
 interface PreviewPanelProps {
   onExportPDF?: () => void
@@ -60,10 +89,16 @@ export function PreviewPanel({ onExportPDF, isExporting }: PreviewPanelProps) {
       </div>
 
       <div className="flex-1 overflow-auto p-8" id="preview-content">
-        {document.type === "form" ? <FormRenderer schema={document} /> : <InvoiceRenderer schema={document} />}
+        {document.type === "form" ? (
+          <FormRenderer schema={document} />
+        ) : document.type === "invoice" ? (
+          <InvoiceRenderer schema={document} />
+        ) : (
+          <ResumeRenderer document={document} />
+        )}
       </div>
 
       {isForm && <ShareFormDialog open={showShareDialog} onOpenChange={setShowShareDialog} />}
-    </div>
+    </div >
   )
 }

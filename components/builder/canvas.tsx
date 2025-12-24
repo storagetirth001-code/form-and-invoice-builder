@@ -36,6 +36,13 @@ function SortableComponent({ component }: { component: Component }) {
     if (comp.type === "discount") return "Discount"
     if (comp.type === "notes") return "Notes"
     if (comp.type === "footer") return "Footer"
+    if (comp.type === "resume-header") return "Header"
+    if (comp.type === "summary") return "Summary"
+    if (comp.type === "experience") return "Experience"
+    if (comp.type === "education") return "Education"
+    if (comp.type === "skills") return "Skills"
+    if (comp.type === "projects") return "Projects"
+    if (comp.type === "certifications") return "Certifications"
     return comp.type
   }
 
@@ -94,7 +101,11 @@ export function Canvas() {
         <div className="mb-4">
           <h1 className="text-2xl font-bold">{document.title}</h1>
           <p className="text-sm text-muted-foreground">
-            {document.type === "form" ? "Form Builder" : "Invoice Builder"}
+            {document.type === "form"
+              ? "Form Builder"
+              : document.type === "invoice"
+                ? "Invoice Builder"
+                : "Resume Builder"}
           </p>
         </div>
 

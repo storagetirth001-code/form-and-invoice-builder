@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { FileText, Receipt, Plus } from "lucide-react"
+import { FileText, Receipt, Plus, UserCircle } from "lucide-react"
 import type { DocumentType } from "@/lib/types/schema"
 import { getTemplatesByType } from "@/lib/templates"
 import { createBrowserClient } from "@supabase/ssr"
@@ -32,7 +32,7 @@ export default function NewDocumentPage() {
       const newDoc = {
         id: crypto.randomUUID(),
         type: selectedType,
-        title: selectedType === "form" ? "New Form" : "New Invoice",
+        title: selectedType === "form" ? "New Form" : selectedType === "invoice" ? "New Invoice" : "New Resume",
         components: [],
         theme: "default",
         user_id: user.id,
@@ -150,6 +150,23 @@ export default function NewDocumentPage() {
                 </div>
               </div>
             </Card>
+
+            <Card
+              className="p-8 cursor-pointer hover:border-primary transition-colors"
+              onClick={() => setSelectedType("resume")}
+            >
+              <div className="flex flex-col items-center text-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <UserCircle className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold mb-2">Resume Builder</h2>
+                  <p className="text-muted-foreground">
+                    Build a professional resume with pre-designed blocks and A4 PDF export
+                  </p>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
@@ -165,7 +182,7 @@ export default function NewDocumentPage() {
           <Button variant="ghost" onClick={() => setSelectedType(null)} className="mb-4">
             ← Back
           </Button>
-          <h1 className="text-3xl font-bold mb-2">Choose a {selectedType === "form" ? "Form" : "Invoice"} Template</h1>
+          <h1 className="text-3xl font-bold mb-2">Choose a {selectedType === "form" ? "Form" : selectedType === "invoice" ? "Invoice" : "Resume"} Template</h1>
           <p className="text-muted-foreground">Start with a template or create from scratch</p>
         </div>
 
@@ -195,8 +212,10 @@ export default function NewDocumentPage() {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                   {selectedType === "form" ? (
                     <FileText className="w-6 h-6 text-primary" />
-                  ) : (
+                  ) : selectedType === "invoice" ? (
                     <Receipt className="w-6 h-6 text-primary" />
+                  ) : (
+                    <UserCircle className="w-6 h-6 text-primary" />
                   )}
                 </div>
                 <div>

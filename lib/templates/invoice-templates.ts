@@ -171,4 +171,109 @@ export const INVOICE_TEMPLATES: DocumentSchema[] = [
       },
     ],
   },
+  {
+    id: "tax-invoice",
+    type: "invoice",
+    theme: "professional",
+    title: "Tax Invoice",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    components: [
+      {
+        id: crypto.randomUUID(),
+        type: "header",
+        company: "Tax Solutions Group",
+        address: "500 Financial Center, Suite 500, City, State 12345",
+        phone: "+1 (800) TAX-HELP",
+        email: "billing@taxsolutions.com",
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "client",
+        name: "Enterprise Corp",
+        email: "accounts.payable@enterprise.com",
+        address: "1000 Business Pkwy, City, State 12345",
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "items",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            name: "Quarterly Audit",
+            quantity: 1,
+            price: 5000,
+          },
+          {
+            id: crypto.randomUUID(),
+            name: "Compliance Consulting",
+            quantity: 10,
+            price: 250,
+          },
+        ],
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "tax",
+        rate: 15,
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "notes",
+        content: "Tax identification number: TX-12345-678. Reference AUDIT-Q4-2024.",
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "footer",
+        content: "Electronic Payment preferred. Thank you.",
+      },
+    ],
+  },
+  {
+    id: "retainer-invoice",
+    type: "invoice",
+    theme: "clean",
+    title: "Retainer Invoice",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    components: [
+      {
+        id: crypto.randomUUID(),
+        type: "header",
+        company: "Consulting Partners",
+        address: "700 Professional Way, City, State 12345",
+        phone: "+1 (555) 000-1111",
+        email: "finance@consultingpartners.com",
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "client",
+        name: "Valued Client",
+        email: "contact@valuedclient.com",
+        address: "99 Success Rd, City, State 12345",
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "items",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            name: "Monthly Strategic Retainer - January",
+            quantity: 1,
+            price: 3000,
+          },
+        ],
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "notes",
+        content: "This invoice covers the retainer for the upcoming month. Standard hourly rates apply for work exceeding the retainer scope.",
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "footer",
+        content: "We value our partnership. Happy New Year!",
+      },
+    ],
+  },
 ]

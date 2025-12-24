@@ -15,10 +15,18 @@ export type ComponentType =
   | "discount"
   | "notes"
   | "footer"
+  // Resume components
+  | "resume-header"
+  | "summary"
+  | "experience"
+  | "education"
+  | "skills"
+  | "projects"
+  | "certifications"
 
-export type DocumentType = "form" | "invoice"
+export type DocumentType = "form" | "invoice" | "resume"
 
-export type Theme = "clean" | "minimal" | "professional" | "modern"
+export type Theme = "clean" | "minimal" | "professional" | "modern" | "developer"
 
 // Base component interface
 export interface BaseComponent {
@@ -109,6 +117,94 @@ export interface FooterComponent extends BaseComponent {
   content: string
 }
 
+// Resume components
+export interface ResumeHeaderComponent extends BaseComponent {
+  type: "resume-header"
+  name: string
+  title: string
+  email: string
+  phone?: string
+  location?: string
+  website?: string
+  linkedin?: string
+  github?: string
+}
+
+export interface SummaryComponent extends BaseComponent {
+  type: "summary"
+  content: string
+}
+
+export interface ExperienceItem {
+  id: string
+  role: string
+  company: string
+  duration: string
+  location?: string
+  description: string
+}
+
+export interface ExperienceComponent extends BaseComponent {
+  type: "experience"
+  title: string
+  items: ExperienceItem[]
+}
+
+export interface EducationItem {
+  id: string
+  degree: string
+  school: string
+  duration: string
+  location?: string
+  description?: string
+}
+
+export interface EducationComponent extends BaseComponent {
+  type: "education"
+  title: string
+  items: EducationItem[]
+}
+
+export interface SkillItem {
+  id: string
+  name: string
+  level?: "Beginner" | "Intermediate" | "Advanced" | "Expert"
+}
+
+export interface SkillsComponent extends BaseComponent {
+  type: "skills"
+  title: string
+  items: SkillItem[]
+}
+
+export interface ProjectItem {
+  id: string
+  name: string
+  role?: string
+  duration?: string
+  description: string
+  link?: string
+}
+
+export interface ProjectsComponent extends BaseComponent {
+  type: "projects"
+  title: string
+  items: ProjectItem[]
+}
+
+export interface CertificationItem {
+  id: string
+  name: string
+  issuer: string
+  date: string
+}
+
+export interface CertificationsComponent extends BaseComponent {
+  type: "certifications"
+  title: string
+  items: CertificationItem[]
+}
+
 // Union type for all components
 export type Component =
   | TextComponent
@@ -122,6 +218,13 @@ export type Component =
   | DiscountComponent
   | NotesComponent
   | FooterComponent
+  | ResumeHeaderComponent
+  | SummaryComponent
+  | ExperienceComponent
+  | EducationComponent
+  | SkillsComponent
+  | ProjectsComponent
+  | CertificationsComponent
 
 // Main schema
 export interface DocumentSchema {
@@ -140,6 +243,6 @@ export interface DocumentSchema {
 export interface AvailableComponent {
   type: ComponentType
   label: string
-  category: "form" | "invoice"
+  category: "form" | "invoice" | "resume"
   icon: string
 }

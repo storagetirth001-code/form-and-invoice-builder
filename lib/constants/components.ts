@@ -19,3 +19,13 @@ export const INVOICE_COMPONENTS: AvailableComponent[] = [
   { type: "notes", label: "Notes", category: "invoice", icon: "FileText" },
   { type: "footer", label: "Footer", category: "invoice", icon: "AlignLeft" },
 ]
+
+export const RESUME_COMPONENTS: AvailableComponent[] = [
+  { type: "resume-header", label: "Header", category: "resume", icon: "UserCircle" },
+  { type: "summary", label: "Summary", category: "resume", icon: "FileText" },
+  { type: "experience", label: "Experience", category: "resume", icon: "Briefcase" },
+  { type: "education", label: "Education", category: "resume", icon: "GraduationCap" },
+  { type: "skills", label: "Skills", category: "resume", icon: "Award" },
+  { type: "projects", label: "Projects", category: "resume", icon: "FolderGit2" },
+  { type: "certifications", label: "Certifications", category: "resume", icon: "BadgeCheck" },
+]

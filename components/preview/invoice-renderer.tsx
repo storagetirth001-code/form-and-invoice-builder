@@ -66,8 +66,8 @@ function RenderInvoiceComponent({
     case "items": {
       const comp = component as ItemsComponent
       return (
-        <div className="py-6 border-b">
-          <table className="w-full">
+        <div className="py-6 border-b overflow-x-auto">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="border-b">
                 <th className="text-left py-2 text-sm font-semibold">DESCRIPTION</th>
@@ -142,8 +142,8 @@ export function InvoiceRenderer({ schema }: InvoiceRendererProps) {
   const totals = calculateInvoiceTotals(schema.components)
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-8">
-      <Card className="p-8 space-y-0 print:shadow-none">
+    <div className="w-full max-w-[210mm] mx-auto bg-white min-h-[297mm]" id="invoice-preview">
+      <Card className="p-6 sm:p-12 space-y-0 shadow-none border-none rounded-none">
         {schema.components.map((component) => (
           <RenderInvoiceComponent key={component.id} component={component} totals={totals} />
         ))}

@@ -34,14 +34,54 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   historyIndex: -1,
 
   createDocument: (type, title) => {
-    const newDoc: DocumentSchema = {
-      id: crypto.randomUUID(),
-      type,
-      theme: "clean",
-      title,
-      components: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    let newDoc: DocumentSchema
+
+    if (type === "resume") {
+      // For resume, we start with a minimal template structure instead of empty
+      newDoc = {
+        id: crypto.randomUUID(),
+        type,
+        theme: "minimal",
+        title,
+        components: [
+          {
+            id: "header",
+            type: "resume-header",
+            name: "Your Name",
+            title: "Your Title",
+            email: "email@example.com",
+          },
+          {
+            id: "summary",
+            type: "summary",
+            content: "Professional summary goes here...",
+          },
+          {
+            id: "experience",
+            type: "experience",
+            title: "Experience",
+            items: [],
+          },
+          {
+            id: "education",
+            type: "education",
+            title: "Education",
+            items: [],
+          },
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    } else {
+      newDoc = {
+        id: crypto.randomUUID(),
+        type,
+        theme: "clean",
+        title,
+        components: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
     }
 
     saveFormToStorage(newDoc)
@@ -91,7 +131,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
 
     const updatedDoc: DocumentSchema = {
       ...document,
-      components: document.components.map((comp) => (comp.id === id ? { ...comp, ...updates } : comp)),
+      components: document.components.map((comp) => (comp.id === id ? ({ ...comp, ...updates } as Component) : comp)),
       updatedAt: new Date().toISOString(),
     }
 
@@ -134,7 +174,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     const { document, history, historyIndex } = get()
     if (!document) return
 
-    const components = [...document.components]
+    const components = [...document.components] as Component[]
     const [removed] = components.splice(startIndex, 1)
     components.splice(endIndex, 0, removed)
 
