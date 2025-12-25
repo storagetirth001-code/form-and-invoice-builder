@@ -5,124 +5,179 @@ export async function exportToPDF(elementId: string, filename: string) {
   const jsPDF = (await import("jspdf")).default
 
   const element = document.getElementById(elementId)
-  if (!element) {
-    throw new Error("Element not found")
-  }
-
-  // We use the element directly. To ensure we capture the full scrollable content
-  // if it's within a scroll container, html2canvas usually handles this if we configure it right.
-  // But often for "preview-content", it might be a scrollable div.
-  // A safe bet for high fidelity capture of a specific element is to clone it
-  // into a container that allows it to expand to full size, but this can be tricky with
-  // Tailwind's reliance on media queries or parent constraints.
-  //
-  // Given the existing implementation tried to strip styles, the simple approach
-  // is often best: just capture the element.
+  if (!element) throw new Error("Element not found")
 
   try {
-    // We use onclone to modify the document before capture
     const canvas = await html2canvas(element, {
-      scale: 2, // High resolution
+      scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
-      windowWidth: 1200, // Sufficient width for the clone
+
+      // Stability flags
+      foreignObjectRendering: false,
+      windowWidth: 1200,
+
       onclone: (clonedDoc) => {
-        const el = clonedDoc.getElementById(elementId) as HTMLElement
-        if (!el) return
+        const root = clonedDoc.getElementById(elementId) as HTMLElement
+        if (!root) return
 
-        // FORCED RESET for PDF logic: 
-        // We want the element to be at the top-left of the canvas with NO margins
-        // and exactly 210mm wide (the standard A4 width we use in renderers)
-        el.style.position = "absolute"
-        el.style.top = "0"
-        el.style.left = "0"
-        el.style.margin = "0"
-        el.style.width = "210mm"
-        el.style.maxWidth = "210mm"
-        el.style.minHeight = "297mm"
-        el.style.boxShadow = "none"
-        el.style.borderRadius = "0"
-        el.style.border = "none"
+        /* ===============================
+         * FORCE A4 LAYOUT
+         * =============================== */
+        root.style.position = "absolute"
+        root.style.top = "0"
+        root.style.left = "0"
+        root.style.margin = "0"
+        root.style.width = "210mm"
+        root.style.maxWidth = "210mm"
+        root.style.minHeight = "297mm"
+        root.style.boxShadow = "none"
+        root.style.borderRadius = "0"
+        root.style.border = "none"
 
-        // Ensure parent containers in the clone don't shift or pad the element
-        if (el.parentElement) {
-          el.parentElement.style.padding = "0"
-          el.parentElement.style.margin = "0"
+        if (root.parentElement) {
+          root.parentElement.style.margin = "0"
+          root.parentElement.style.padding = "0"
         }
 
-        // Helper to convert any color to rgba using canvas
+        /* ===============================
+         * SVG → IMG (LAB-SAFE)
+         * =============================== */
+        const svgs = Array.from(clonedDoc.getElementsByTagName("svg"))
+
+        svgs.forEach(svg => {
+          try {
+            const width = svg.clientWidth || 16
+            const height = svg.clientHeight || 16
+
+            const serializer = new XMLSerializer()
+            let svgText = serializer.serializeToString(svg)
+
+            // 🔥 REMOVE MODERN COLOR FUNCTIONS FROM SVG SOURCE
+            svgText = svgText.replace(
+              /(lab|oklch|lch)\([^)]+\)/gi,
+              "rgb(0,0,0)"
+            )
+
+            const encoded = encodeURIComponent(svgText)
+              .replace(/'/g, "%27")
+              .replace(/"/g, "%22")
+
+            const img = clonedDoc.createElement("img")
+            img.src = `data:image/svg+xml;charset=utf-8,${encoded}`
+            img.width = width
+            img.height = height
+            img.style.display = "inline-block"
+
+            if (svg.getAttribute("style")) {
+              img.setAttribute("style", svg.getAttribute("style")!)
+            }
+
+            svg.replaceWith(img)
+          } catch {
+            svg.remove()
+          }
+        })
+
+        /* ===============================
+         * COLOR SANITIZATION (CSS)
+         * =============================== */
         const colorToRgba = (color: string) => {
-          const canvas = document.createElement("canvas")
-          canvas.width = 1
-          canvas.height = 1
-          const ctx = canvas.getContext("2d")
+          if (!color || color === "transparent") return "rgba(0,0,0,0)"
+          const c = document.createElement("canvas")
+          c.width = 1
+          c.height = 1
+          const ctx = c.getContext("2d")
           if (!ctx) return color
           ctx.fillStyle = color
           ctx.fillRect(0, 0, 1, 1)
-          const data = ctx.getImageData(0, 0, 1, 1).data
-          return `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`
+          const d = ctx.getImageData(0, 0, 1, 1).data
+          return `rgba(${d[0]}, ${d[1]}, ${d[2]}, ${d[3] / 255})`
         }
 
-        const elements = clonedDoc.getElementsByTagName("*")
-        for (let i = 0; i < elements.length; i++) {
-          const item = elements[i] as HTMLElement
-          const styles = window.getComputedStyle(item)
+        const nodes = Array.from(clonedDoc.getElementsByTagName("*"))
+        nodes.push(clonedDoc.documentElement, clonedDoc.body)
 
-          // Color Sanitization for oklch/lab
-          const colorProps = ["color", "backgroundColor", "borderColor", "fill", "stroke"]
+        const colorProps = [
+          "color",
+          "background-color",
+          "border-color",
+          "outline-color",
+          "text-decoration-color",
+          "box-shadow",
+        ]
+
+        nodes.forEach(node => {
+          const el = node as HTMLElement
+          if (!el.style) return
+          const styles = window.getComputedStyle(el)
+
           colorProps.forEach(prop => {
-            const value = (item.style as any)[prop] || styles[prop as any]
-            if (value && (value.includes("oklch") || value.includes("lab") || value.includes("var("))) {
-              try {
-                const computed = styles[prop as any]
-                if (computed.includes("oklch") || computed.includes("lab")) {
-                  item.style[prop as any] = colorToRgba(computed)
-                }
-              } catch (e) { }
+            const value = styles.getPropertyValue(prop)
+            if (value && (value.includes("lab(") || value.includes("oklch("))) {
+              el.style.setProperty(prop, colorToRgba(value), "important")
             }
           })
-        }
+        })
+
+        /* ===============================
+         * SANITIZE <style> TAGS
+         * =============================== */
+        Array.from(clonedDoc.getElementsByTagName("style")).forEach(style => {
+          if (style.textContent) {
+            style.textContent = style.textContent.replace(
+              /(lab|oklch|lch)\([^)]+\)/gi,
+              "rgb(0,0,0)"
+            )
+          }
+        })
+
+        /* ===============================
+         * REMOVE EXTERNAL STYLESHEETS
+         * =============================== */
+        Array.from(clonedDoc.getElementsByTagName("link")).forEach(link => {
+          if (
+            link.rel === "stylesheet" &&
+            (link.href.includes("tailwind") || link.href.includes("globals"))
+          ) {
+            link.remove()
+          }
+        })
       },
     })
 
-    // Prepare PDF
+    /* ===============================
+     * CREATE PDF (LINKS PRESERVED)
+     * =============================== */
     const pdf = new jsPDF({
       orientation: "p",
       unit: "mm",
       format: "a4",
-      compress: true
+      compress: true,
     })
 
     const imgData = canvas.toDataURL("image/png")
+    const pageWidth = 210
+    const pageHeight = 297
+    const imgHeight = (canvas.height * pageWidth) / canvas.width
 
-    // A4 dimensions in mm
-    const a4Width = 210
-    const a4Height = 297
-
-    // The canvas width represents 210mm because we forced el.style.width = "210mm"
-    const imgWidth = a4Width
-    const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-    // Handle multi-page
     let heightLeft = imgHeight
     let position = 0
 
-    // Add first page
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, 'FAST')
-    heightLeft -= a4Height
+    pdf.addImage(imgData, "PNG", 0, position, pageWidth, imgHeight)
+    heightLeft -= pageHeight
 
-    // Add extra pages if needed
     while (heightLeft > 0) {
       pdf.addPage()
       position = heightLeft - imgHeight
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, 'FAST')
-      heightLeft -= a4Height
+      pdf.addImage(imgData, "PNG", 0, position, pageWidth, imgHeight)
+      heightLeft -= pageHeight
     }
 
     pdf.save(filename)
-  } catch (error) {
-    console.error("PDF Export failed:", error)
-    throw error
+  } catch (err) {
+    console.error("PDF export failed:", err)
+    throw err
   }
 }

@@ -23,6 +23,7 @@ export type ComponentType =
   | "skills"
   | "projects"
   | "certifications"
+  | "publications"
 
 export type DocumentType = "form" | "invoice" | "resume"
 
@@ -195,12 +196,13 @@ export interface ProjectsComponent extends BaseComponent {
 export interface CertificationItem {
   id: string
   name: string
-  issuer: string
-  date: string
+  issuer?: string
+  date?: string
+  description?: string
 }
 
 export interface CertificationsComponent extends BaseComponent {
-  type: "certifications"
+  type: "certifications" | "publications"
   title: string
   items: CertificationItem[]
 }

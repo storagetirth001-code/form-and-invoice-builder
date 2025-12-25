@@ -129,6 +129,102 @@ export function createComponent(type: ComponentType): Component {
         type: "footer",
         content: "Thank you for your business!",
       }
+    case "resume-header":
+      return {
+        id,
+        type: "resume-header",
+        name: "Your Name",
+        title: "Professional Title",
+        email: "your@email.com",
+      }
+    case "summary":
+      return {
+        id,
+        type: "summary",
+        content: "Professional summary goes here...",
+      }
+    case "experience":
+      return {
+        id,
+        type: "experience",
+        title: "Experience",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            role: "Role",
+            company: "Company",
+            duration: "Duration",
+            description: "Description",
+          },
+        ],
+      }
+    case "education":
+      return {
+        id,
+        type: "education",
+        title: "Education",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            degree: "Degree",
+            school: "University",
+            duration: "Duration",
+          },
+        ],
+      }
+    case "skills":
+      return {
+        id,
+        type: "skills",
+        title: "Skills",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            name: "Skill Name",
+            level: "Intermediate",
+          },
+        ],
+      }
+    case "projects":
+      return {
+        id,
+        type: "projects",
+        title: "Projects",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            name: "Project Name",
+            description: "Description",
+          },
+        ],
+      }
+    case "certifications":
+      return {
+        id,
+        type: "certifications",
+        title: "Certifications",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            name: "Certification Name",
+            issuer: "Issuer",
+            date: "Date",
+          },
+        ],
+      }
+    case "publications":
+      return {
+        id,
+        type: "publications",
+        title: "Publications",
+        items: [
+          {
+            id: crypto.randomUUID(),
+            name: "Publication Title",
+            description: "Description",
+          },
+        ],
+      }
 
     default:
       throw new Error(`Unknown component type: ${type}`)

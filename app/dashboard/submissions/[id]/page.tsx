@@ -137,6 +137,7 @@ export default function SubmissionsPage() {
         .order("submitted_at", { ascending: false })
 
       if (submissionsError) throw submissionsError
+      console.log(submissionsData)
       setSubmissions(submissionsData || [])
     } catch (error: any) {
       toast({
@@ -173,9 +174,10 @@ export default function SubmissionsPage() {
     const csvRows = [headers.join(",")]
 
     submissions.forEach((sub) => {
+      const escapedDate = `"${new Date(sub.submitted_at).toLocaleString().replace(/"/g, '""')}"`
       const row = [
         sub.id,
-        new Date(sub.submitted_at).toLocaleString(),
+        escapedDate,
         ...fields.map((field) => {
           const value = sub.data[field]
           if (value === undefined || value === null) return ""

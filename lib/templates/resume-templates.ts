@@ -324,4 +324,215 @@ export const RESUME_TEMPLATES: DocumentSchema[] = [
             },
         ],
     },
+    {
+        id: "resume-academic",
+        type: "resume",
+        theme: "professional",
+        title: "Academic Resume",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        components: [
+            {
+                id: crypto.randomUUID(),
+                type: "resume-header",
+                name: "Dr. Emily Watson",
+                title: "Associate Professor of AI",
+                email: "e.watson@university.edu",
+                phone: "+1 (555) 444-5555",
+                location: "Cambridge, MA",
+                website: "emilywatson.ai",
+                linkedin: "linkedin.com/in/emilywatson-ai",
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "summary",
+                content:
+                    "Dedicated researcher and educator with 12+ years of experience in Artificial Intelligence and Machine Learning. Published over 20 peer-reviewed papers in top-tier journals. Specialized in Computer Vision and Neural Networks.",
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "experience",
+                title: "Academics & Research",
+                items: [
+                    {
+                        id: crypto.randomUUID(),
+                        role: "Associate Professor",
+                        company: "University of Technology",
+                        duration: "2018 - Present",
+                        location: "Cambridge, MA",
+                        description:
+                            "Teaching advanced ML courses and supervising PhD candidates. Lead researcher in the Lab for Autonomous Intelligence.",
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        role: "Postdoctoral Researcher",
+                        company: "Standard Tech",
+                        duration: "2015 - 2018",
+                        location: "Palo Alto, CA",
+                        description:
+                            "Conducted research on deep learning optimization techniques. Published in NeurIPS and ICML.",
+                    },
+                ],
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "education",
+                title: "Academic Background",
+                items: [
+                    {
+                        id: crypto.randomUUID(),
+                        degree: "Ph.D. in Computer Science",
+                        school: "Stanford University",
+                        duration: "2010 - 2015",
+                    },
+                ],
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "publications",
+                title: "Key Publications",
+                items: [
+                    {
+                        id: crypto.randomUUID(),
+                        name: "Advancements in Neural Networks",
+                        description: "Journal of AI Research, 2023. A comprehensive study on transformer architectures.",
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        id: "resume-tech-modern",
+        type: "resume",
+        theme: "modern",
+        title: "Modern Tech Resume",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        components: [
+            {
+                id: crypto.randomUUID(),
+                type: "resume-header",
+                name: "James Carter",
+                title: "Full Stack Developer",
+                email: "james.carter@tech.dev",
+                phone: "+1 (555) 000-1111",
+                location: "Seattle, WA",
+                github: "github.com/jcarter-dev",
+                website: "jcarter.dev",
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "summary",
+                content:
+                    "Modern full-stack engineer focused on building performant, user-centric applications. Expert in React, Node.js, and Cloud Infrastructure. Passionate about Open Source and cutting-edge web technologies.",
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "skills",
+                title: "Tech Stack",
+                items: [
+                    { id: crypto.randomUUID(), name: "TypeScript / Go / Rust", level: "Expert" },
+                    { id: crypto.randomUUID(), name: "React / Next.js / Tailwind", level: "Expert" },
+                    { id: crypto.randomUUID(), name: "AWS / Kubernetes / Docker", level: "Advanced" },
+                    { id: crypto.randomUUID(), name: "GraphQL / Redis / PostgreSQL", level: "Expert" },
+                ],
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "experience",
+                title: "Engineering Roles",
+                items: [
+                    {
+                        id: crypto.randomUUID(),
+                        role: "Tech Lead",
+                        company: "CloudNative SaaS",
+                        duration: "2021 - Present",
+                        location: "Remote",
+                        description:
+                            "Architecting microservices architecture and leading a team of 10 developers. Reduced infra costs by 35%.",
+                    },
+                ],
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "projects",
+                title: "Open Source & Side Projects",
+                items: [
+                    {
+                        id: crypto.randomUUID(),
+                        name: "FastAPI-Rust",
+                        description: "A high-performance backend framework connector.",
+                        link: "github.com/jcarter-dev/fastapi-rust",
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        id: "resume-designer",
+        type: "resume",
+        theme: "developer",
+        title: "Designer Professional",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        components: [
+            {
+                id: crypto.randomUUID(),
+                type: "resume-header",
+                name: "Sophia Chen",
+                title: "Senior Product Designer",
+                email: "sophia.design@portfolio.com",
+                phone: "+1 (555) 333-2222",
+                location: "New York, NY",
+                website: "sophiachen.design",
+                linkedin: "linkedin.com/in/sophiachen-design",
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "summary",
+                content:
+                    "Human-centered product designer with a focus on creating elegant solutions for complex problems. 6+ years of experience in mobile and web design. Expertise in Figma, design systems, and user research.",
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "experience",
+                title: "Design Experience",
+                items: [
+                    {
+                        id: crypto.randomUUID(),
+                        role: "Senior Product Designer",
+                        company: "FinTech Innovations",
+                        duration: "2021 - Present",
+                        location: "New York, NY",
+                        description:
+                            "Led the redesign of the main investment portal, increasing conversion by 25%. Built a multi-platform design system from scratch.",
+                    },
+                ],
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "skills",
+                title: "Design Toolkit",
+                items: [
+                    { id: crypto.randomUUID(), name: "Product Design / UI / UX", level: "Expert" },
+                    { id: crypto.randomUUID(), name: "Figma / ProtoPie / Framer", level: "Expert" },
+                    { id: crypto.randomUUID(), name: "Design Systems", level: "Expert" },
+                    { id: crypto.randomUUID(), name: "HTML / CSS / React", level: "Intermediate" },
+                ],
+            },
+            {
+                id: crypto.randomUUID(),
+                type: "projects",
+                title: "Recent Projects",
+                items: [
+                    {
+                        id: crypto.randomUUID(),
+                        name: "CryptoWallet Redesign",
+                        description: "A complete overhaul of the mobile wallet app focus on accessibility and ease of use.",
+                        link: "behance.net/sophiachen/cryptowallet",
+                    },
+                ],
+            },
+        ],
+    },
 ]

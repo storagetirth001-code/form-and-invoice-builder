@@ -31,7 +31,6 @@ export async function POST(request: Request) {
 
     // If Google Sheet URL is provided, log it for future integration
     if (formData?.google_sheet_url) {
-      console.log("[v0] Form has Google Sheet integration:", formData.google_sheet_url)
       // Note: Google Sheets integration requires:
       // 1. Google Apps Script webhook setup
       // 2. Or use Zapier/Make.com with form submissions webhook

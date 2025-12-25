@@ -10,6 +10,7 @@ import type {
     CertificationsComponent,
 } from "@/lib/types/schema"
 import { cn } from "@/lib/utils"
+import { Github, Linkedin, Globe, Mail, Phone, MapPin, Link as LinkIcon, ExternalLink } from "lucide-react"
 
 interface ResumeRendererProps {
     document: DocumentSchema
@@ -27,6 +28,13 @@ export function ResumeRenderer({ document, className }: ResumeRendererProps) {
     const skills = components.find((c) => c.type === "skills") as SkillsComponent | undefined
     const projects = components.find((c) => c.type === "projects") as ProjectsComponent | undefined
     const certifications = components.find((c) => c.type === "certifications") as CertificationsComponent | undefined
+
+    // Helper to format URLs
+    const formatUrl = (url: string) => {
+        if (!url) return ""
+        if (url.startsWith("http://") || url.startsWith("https://")) return url
+        return `https://${url}`
+    }
 
     // Base styles for A4 layout
     const baseStyles = "bg-white text-black min-h-[297mm] w-full max-w-[210mm] mx-auto p-6 sm:p-12 shadow-sm"
@@ -49,13 +57,42 @@ export function ResumeRenderer({ document, className }: ResumeRendererProps) {
                 <header className="mb-8 border-b pb-8">
                     <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">{header.name}</h1>
                     <p className="text-xl text-gray-600 mb-4">{header.title}</p>
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                        {header.email && <span>{header.email}</span>}
-                        {header.phone && <span>• {header.phone}</span>}
-                        {header.location && <span>• {header.location}</span>}
-                        {header.website && <span>• {header.website}</span>}
-                        {header.linkedin && <span>• {header.linkedin}</span>}
-                        {header.github && <span>• {header.github}</span>}
+                    <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
+                        {header.email && (
+                            <div className="flex items-center gap-1.5">
+                                <Mail className="w-4 h-4" />
+                                <span>{header.email}</span>
+                            </div>
+                        )}
+                        {header.phone && (
+                            <div className="flex items-center gap-1.5">
+                                <Phone className="w-4 h-4" />
+                                <span>{header.phone}</span>
+                            </div>
+                        )}
+                        {header.location && (
+                            <div className="flex items-center gap-1.5">
+                                <MapPin className="w-4 h-4" />
+                                <span>{header.location}</span>
+                            </div>
+                        )}
+                        <div className="flex items-center gap-4 ml-auto">
+                            {header.website && (
+                                <a href={formatUrl(header.website)} target="_blank" rel="noreferrer" className="hover:text-black">
+                                    <Globe className="w-5 h-5" />
+                                </a>
+                            )}
+                            {header.linkedin && (
+                                <a href={formatUrl(header.linkedin)} target="_blank" rel="noreferrer" className="hover:text-black">
+                                    <Linkedin className="w-5 h-5" />
+                                </a>
+                            )}
+                            {header.github && (
+                                <a href={formatUrl(header.github)} target="_blank" rel="noreferrer" className="hover:text-black">
+                                    <Github className="w-5 h-5" />
+                                </a>
+                            )}
+                        </div>
                     </div>
                 </header>
             )}
@@ -100,8 +137,9 @@ export function ResumeRenderer({ document, className }: ResumeRendererProps) {
                                 <div className="flex justify-between items-baseline mb-1">
                                     <h3 className="font-bold">{item.name}</h3>
                                     {item.link && (
-                                        <a href={item.link} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline">
-                                            {item.link}
+                                        <a href={formatUrl(item.link)} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm text-blue-600 hover:underline">
+                                            <span>Live URL</span>
+                                            <ExternalLink className="w-3 h-3" />
                                         </a>
                                     )}
                                 </div>

@@ -13,7 +13,6 @@ export async function saveFormToStorage(schema: DocumentSchema) {
     })
 
     if (error) throw error
-    console.log("[v0] Form saved to database:", schema.id)
   } catch (error) {
     console.error("[v0] Failed to save form:", error)
   }
